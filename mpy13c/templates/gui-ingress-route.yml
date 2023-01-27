@@ -1,0 +1,29 @@
+---
+kind: IngressRoute 
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: {{ include "mpy13c.fullname" . }}-gui-ir
+  labels:
+    {{- include "mpy13c.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "gui_ingress_route"
+
+spec:
+  entryPoints:
+    - web 
+    - websecure
+  routes:
+  - match: "Host(`{{ .Values.gui_worker.fqdn }}`) && PathPrefix(`/`)"
+    kind: Rule
+    services:
+    - name: {{ include "mpy13c.fullname" . | quote }}
+      kind: Service
+      port: http
+  
+  - match: "Host(`{{ .Values.gui_worker.fqdn }}`) && PathPrefix(`/longpolling`)"
+    kind: Rule
+    services:
+    - name: {{ include "mpy13c.fullname" . | quote }}
+      kind: Service
+      port: gevent
+  tls:
+    secretName: "traefik2-mpy13c-gui"

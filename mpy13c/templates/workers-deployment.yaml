@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mpy13c.fullname" . }}-workers
+  labels:
+    {{- include "mpy13c.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "imq_worker"
+spec:
+  {{- if not .Values.imq_worker.autoscaling.enabled }}
+  replicas: {{ .Values.imq_worker.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mpy13c.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "imq_worker"
+
+  template:
+    metadata:
+      {{- with .Values.imq_worker.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mpy13c.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: imq_worker
+    spec:
+      imagePullSecrets:
+       - name: {{ .Values.imagePullSecrets.mainDockerSource.name | quote }}
+
+      serviceAccountName: {{ include "mpy13c.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: workers-{{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["--no-http"]
+          env: 
+            {{- toYaml .Values.postgresql_db_env | nindent 12 }}
+            {{- toYaml .Values.ikb_options_env | nindent 12 }}
+          resources:
+            {{- toYaml .Values.imq_worker.resources | nindent 12 }}
+      {{- with .Values.imq_worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imq_worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imq_worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

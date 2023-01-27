@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  mpy13c:
+  - apiVersion: v2
+    appVersion: 13.14.3
+    created: "2023-01-27T11:34:03.498106663+01:00"
+    description: A Helm chart for Muppy 13c
+    digest: f0386872ba459c0b9bb99c5c61b54eacf35625bb2e38f9b21f28c7190494793b
+    name: mpy13c
+    type: application
+    urls:
+    - mpy13c-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-01-27T11:34:03.497377157+01:00"

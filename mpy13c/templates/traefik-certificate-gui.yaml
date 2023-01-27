@@ -1,0 +1,11 @@
+kind: Certificate  # traefik2-cert
+apiVersion: cert-manager.io/v1
+metadata:
+  name: traefik2-mpy13c-gui
+spec:
+  secretName: "traefik2-mpy13c-gui"
+  issuerRef:
+    name: {{ .Values.gui_worker.issuerRef | quote }}
+  commonName: {{ .Values.gui_worker.fqdn | quote }}
+  dnsNames:
+    - {{ .Values.gui_worker.fqdn | quote }}

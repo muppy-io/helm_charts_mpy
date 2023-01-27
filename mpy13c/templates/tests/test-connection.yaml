@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "mpy13c.fullname" . }}-test-connection"
+  labels:
+    {{- include "mpy13c.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "mpy13c.fullname" . }}:{{ .Values.gui_worker.service.ports.http }}']
+  restartPolicy: Never

@@ -1,0 +1,129 @@
+# Default values for mpy13c.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  # The Docker private repository containing mpy13c docker image
+  repository: ""
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: 
+    mainDockerSource:
+      # You can choose whatever name you want.
+      # TODO: describe how to generate the docker config JSON
+      name: ""
+      dockerConfigJSON: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+letsEncrypt:
+  email: ""
+
+# Settings for the GUI pod
+gui_worker:
+    # fqdn: You can use whatever value as long as you are able to setup DNS
+    fqdn: ""
+    # Only prod is defined for now
+    issuerRef: letsencrypt-prod 
+    # secretName: traefik2-mpy13c
+    args: []
+    # Scaling settings
+    replicaCount: 1
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 4
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+    # Advanced settings
+    service:
+      type: ClusterIP
+      ports: 
+        http: 8069
+        gevent: 8072
+    podAnnotations: {}
+    resources: {}
+    nodeSelector: {}
+    affinity: {}
+    tolerations: []
+
+# Settings for the inouk message queue workers
+imq_worker:
+    replicaCount: 1
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 4
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+
+  # Advanced settings
+    podAnnotations: {}
+
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+    nodeSelector: {}
+    affinity: {}
+    tolerations: []
+
+#
+# Database access
+postgresql_db_env:
+  - name: PGHOST
+    value: ""
+  - name: PGPORT
+    value: "5432"
+  - name: PGUSER
+    value: ""
+  - name: PGPASSWORD
+    value: ""
+  - name: PGDATABASE
+    value: ""
+  - name: PGFILTER
+    value: ""
+
+ikb_options_env:
+  - name: IKB_MAX_CRON_THREADS
+    value: "4"
+  - name: IKB_WORKERS
+    value: "1"
+  - name: IKB_NO_HTTP
+    value: "True"
+  - name: INOUK_SESSION_STORE
+    value: "postgresql"
+# - name: IKB_DEBUG
+#   value: ""
+

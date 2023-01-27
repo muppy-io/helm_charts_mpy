@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mpy13c.fullname" . }}
+  labels:
+    {{- include "mpy13c.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "gui_worker"
+
+spec:
+  type: {{ .Values.gui_worker.service.type }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .Values.gui_worker.service.ports.http }}
+      protocol: TCP
+    - name: gevent
+      port: 8072
+      targetPort: {{ .Values.gui_worker.service.ports.gevent }}
+      protocol: TCP
+
+  selector:
+    {{- include "mpy13c.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: "gui_worker"
